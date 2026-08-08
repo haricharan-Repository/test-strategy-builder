@@ -1,0 +1,1 @@
+As an online store customer, I should be able to add items to my shopping cart, adjust item quantities, and proceed to checkout with a valid payment method. The cart should calculate totals correctly, apply discounts when eligible, and prevent checkout if required fields are missing or invalid.
