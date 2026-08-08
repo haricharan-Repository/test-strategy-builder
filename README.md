@@ -2,32 +2,28 @@
 
 A TypeScript tool with both CLI and web UI support for generating an Excel-based test strategy from a requirement description.
 
+Repository: https://github.com/haricharan-Repository/test-strategy-builder
+
 ## What it does
 
+- Accepts requirements as pasted text, an uploaded file (`.txt`, `.md`, `.json`, `.docx`, `.pdf`, `.xlsx`/`.xls`), or a Figma file URL
 - Parses requirement text for feature areas, roles, actions, and constraints
-- Builds core scenarios, edge cases, negative tests, and additional test coverage
+- Optionally uses OpenAI for richer extraction and test case generation, with an automatic local-parser fallback when no API key is set
+- Generates 35+ categories of test cases (core scenarios, edge cases, negative tests, security, data, performance, accessibility, compatibility, and more)
 - Automatically categorizes test cases by feature area
+- Builds a full test plan and an enterprise-grade test strategy document (scope, methodology, quality standards, risk profile, governance)
 - Provides a browser UI for analysis, preview, and Excel download
+- Keeps a local history of recent generations
 
 ## Setup
 
-Install dependencies:
+Clone and install dependencies:
 
 ```bash
-cd /Users/haricharanboganatham/Desktop/Code/TestStrategy Building Agent
+git clone https://github.com/haricharan-Repository/test-strategy-builder.git
+cd test-strategy-builder
 npm install
 ```
-
-## Run the web UI
-
-Start the backend API server and the frontend separately.
-
-```bash
-npm run server
-npm run dev
-```
-
-Then open the displayed Vite URL in your browser.
 
 ### Environment variables
 
@@ -43,13 +39,26 @@ For Figma URL extraction, optionally set:
 export FIGMA_API_TOKEN="your-figma-personal-access-token"
 ```
 
-If no OpenAI key is provided, the tool will still work using a local parser fallback.
+If no OpenAI key is provided, the tool still works using a local parser fallback.
 
-## Build for production
+The API server listens on port `4000` by default; override with `PORT`.
+
+## Run the web UI
+
+Easiest option — run the API server and the Vite frontend together:
 
 ```bash
-npm run build
+npm run dev:full
 ```
+
+Or start them separately in two terminals:
+
+```bash
+npm run server:dev
+npm run dev
+```
+
+Then open the displayed Vite URL in your browser (proxies `/api` to `http://localhost:4000`).
 
 ## Use the CLI
 
@@ -57,9 +66,35 @@ npm run build
 npm run cli -- --requirement sample_requirement.txt --output test_strategy.xlsx
 ```
 
+If `--requirement` is omitted, the CLI reads requirement text from stdin.
+
+## Build for production
+
+```bash
+npm run build
+npm start
+```
+
+`npm run build` compiles the React frontend (`dist/`) and the Express server + CLI (`dist-server/`). `npm start` builds and then serves the production frontend from the Express server.
+
 ## Excel output
 
 The generated workbook includes:
 
 - `Requirement Summary` with parsed analysis data
 - `Test Strategy` with feature area categorization and test cases
+
+The web UI can also export a separate **Enterprise Strategy** workbook with dedicated sheets for the strategy document, quality standards, risk profile, governance, and test cases.
+
+## Project structure
+
+```
+server.ts                  Express API (generate, export, history, enterprise strategy)
+src/index.ts                CLI entry point
+src/lib/analysis.ts         Requirement parsing and test case generation
+src/lib/testStrategy.ts     Standard Excel workbook builder
+src/lib/enterpriseStrategy.ts  Enterprise test strategy builder
+src/ui/                     React frontend (Vite)
+```
+
+Generated history (`data/history.json`) and output workbooks (`*.xlsx`) are local runtime artifacts and are not committed to the repository.
